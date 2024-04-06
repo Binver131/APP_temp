@@ -1,0 +1,6 @@
+DefGraphicPart(pushbutton)
+    Component(background)
+    Component_Group(border, 4)
+    Component(symbol)
+    Component(label)
+EndGraphicPart(pushbutton)

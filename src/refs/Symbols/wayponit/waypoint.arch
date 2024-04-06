@@ -1,0 +1,3 @@
+DefGraphicPart(waypoint)
+    Component_Group(waypointGroup, WAYPOINT_LINES_NUM)
+EndGraphicPart(waypoint)
