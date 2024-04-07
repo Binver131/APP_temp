@@ -1,0 +1,3 @@
+DefLayerGraphic(layer_ptr)
+    Component(HelloWorldlabel)
+EndLayerGraphic(layer_ptr)

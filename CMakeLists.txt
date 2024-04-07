@@ -35,6 +35,46 @@ macro(FIND_INCLUDE_DIR result curdir)  #定义函数,2个参数:存放结果resu
     set(${result} ${dirlist})											#dirlist结果放入result变量中
 endmacro()
 
+
+macro(GENERATE_ARCH_FILE C_FILE)
+        get_filename_component(FILE_NAME ${C_FILE} NAME_WE)
+        get_filename_component(FILE_PATH ${C_FILE} DIRECTORY)
+
+        set(headfile_path ${CMAKE_SOURCE_DIR}/build/${FILE_NAME}_arch.h)
+        if(NOT EXISTS ${FILE_PATH}/${FILE_NAME}.arch)
+            message(FATAL_ERROR "Reference ${FILE_NAME} does not exist arch file ${FILE_NAME}.arch in path ${FILE_PATH}!")
+        endif()
+        file(READ ${FILE_PATH}/${FILE_NAME}.arch arch)
+        string(REPLACE "\n" "\\\n" arch_text ${arch} )
+
+        file(WRITE ${headfile_path} "// Auto-generated file, do not edit\n")
+        file(APPEND ${headfile_path} "
+#include\"RTree/GraphicsDataStructures.h\"
+#define GARCH   \\
+    ${arch_text}
+
+#define Component(x) static Gcomponent *x;
+#define Component_Group(x, num) static Gcomponent *x;
+#define DefGraphicPart(x)
+#define EndGraphicPart(x)
+#define DefLayerGraphic(x)
+#define EndSubComponent(x)
+#define SubComponent(x,type) static Gcomponent *x;
+#define EndLayerGraphic(x)
+
+    GARCH
+
+#undef EndLayerGraphic
+#undef DefLayerGraphic
+#undef EndSubComponent
+#undef SubComponent
+#undef DefGraphicPart
+#undef Component
+#undef Component_Group
+#undef EndGraphicPart
+        ")
+endmacro()
+
 macro(GENERATE_C_FILE_LIST HEADER_FILE)
     # 获取目标目录下的所有.c文件
     file(GLOB_RECURSE C_FILES LIST_DIRECTORIES false "${CMAKE_CURRENT_SOURCE_DIR}/src/refs/*.c")
@@ -69,33 +109,7 @@ macro(GENERATE_C_FILE_LIST HEADER_FILE)
 
 
     foreach(C_FILE ${C_FILES})
-        get_filename_component(FILE_NAME ${C_FILE} NAME_WE)
-        get_filename_component(FILE_PATH ${C_FILE} DIRECTORY)
-
-        set(headfile_path ${CMAKE_SOURCE_DIR}/build/${FILE_NAME}_arch.h)
-        if(NOT EXISTS ${FILE_PATH}/${FILE_NAME}.arch)
-            message(FATAL_ERROR "Reference ${FILE_NAME} does not exist arch file ${FILE_NAME}.arch in path ${FILE_PATH}!")
-        endif()
-        file(READ ${FILE_PATH}/${FILE_NAME}.arch arch)
-        string(REPLACE "\n" "\\\n" arch_text ${arch} )
-
-        file(WRITE ${headfile_path} "// Auto-generated file, do not edit\n")
-        file(APPEND ${headfile_path} "
-#include\"RTree/GraphicsDataStructures.h\"
-#define GARCH   \\
-    ${arch_text}
-
-#define Component(x) static Gcomponent *x;
-#define Component_Group(x, num) static Gcomponent *x;
-#define DefGraphicPart(x)
-#define EndGraphicPart(x)
-
-    GARCH
-#undef DefGraphicPart
-#undef Component
-#undef Component_Group
-#undef EndGraphicPart
-        ")
+        GENERATE_ARCH_FILE(${C_FILE})
     endforeach()
 
 endmacro()
@@ -122,7 +136,7 @@ file(GLOB_RECURSE SOURCE
 )
 FIND_INCLUDE_DIR(project_IncludeDir src/)
 GENERATE_C_FILE_LIST(${CMAKE_SOURCE_DIR}/build/ref_list.h)
-
+GENERATE_ARCH_FILE(${CMAKE_SOURCE_DIR}/src/main.c)
 add_executable(${APP_NAME} ${SOURCE} ${CMAKE_SOURCE_DIR}/build/ref_list.h)
 target_link_libraries(${APP_NAME} ${LIBS})
 target_include_directories(${APP_NAME} PRIVATE ${project_IncludeDir} ${CMAKE_SOURCE_DIR}/build/)
