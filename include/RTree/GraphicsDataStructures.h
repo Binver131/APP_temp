@@ -888,6 +888,6 @@ RLayer *insertLayer(RLayer layer, RWindow *window);
 
 string str(const char* format, ...);
 float *float_array(float array[], int size);
-
+void mainloop(int (*Behavior)(void));
 char *packData(char *ptr, char *value, int length,char *targetAddress);
 #endif /* _GRAPHICSDATASTURE_H_ */

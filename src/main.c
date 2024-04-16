@@ -3,8 +3,6 @@
 #include"refs.h"
 #include"time.h"
 
-RApp *currentAPP;
-Gcomponent *buttonRef;
 void initGraphic()
 {
     RTree = initRTtree();
@@ -60,19 +58,12 @@ void initGraphic()
     EndComponent(HelloWorldlabel)
 }
 
-clock_t start,now;
+int Behaviour(){
+    /*main logic here*/
+}
+
+
 void main(){
-    start = clock();
     initGraphic();
-
-    while(1){
-        while (!currentAPP->endRender){}
-        now = clock();
-        double time = (double)(now - start)/CLOCKS_PER_SEC;
-
-        /*main logic here*/
-
-        currentAPP->endRender = false;
-        currentAPP->message_ptr = 0;
-    }
+    mainloop(Behavior);
 }

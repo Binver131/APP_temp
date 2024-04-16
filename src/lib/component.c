@@ -42,7 +42,7 @@ Gcomponent *c_stack_1[50]={NULL};
 GLuint s_index = 0;
 GLubyte next_op = EXTENSION_LW;
 Gcomponent *tempComp_engine_addr1 = NULL;
-
+RApp *currentAPP;
 /*------------------------- FUNCTION DECLARATIONS --------------------*/
 Vertex *add_line_vertexs(Vertex *line_points, GLint num_vertex);
 Gcomponent *add_component_func(GGraphics_list *parm_p_list, Gcomponent *parm_p_component);
@@ -273,4 +273,17 @@ float *float_array(float array[], int size){
     char* arrayAddr = Ralloc(size);
     memcpy(addrconvert(arrayAddr), array, size);
     return (float*)arrayAddr;
+}
+void populate_array(int *array, size_t arraySize, int (*getNextValue)(void))
+{
+
+}
+
+void mainloop(int (*Behavior)(void)){
+     while(1){
+        while (!currentAPP->endRender){}
+        Behavior();
+        currentAPP->endRender = false;
+        currentAPP->message_ptr = 0;
+    }
 }
